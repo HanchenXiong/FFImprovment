@@ -159,35 +159,114 @@ Zalando SE \\ % Your institution for the title page
     \end{equation}
     }
 
-    \onslide<+->{\begin{block}{A new metric: the upper bound of regret}
+    \onslide<+->{\begin{block}{the upper bound of regret}
     $R_{t}^* = \max_{n\in[1,N]} R_{n,t} = \hat{L}_t - \min_{n\in[1,N]}L_{n,t}$
     \end{block}}
 }
     
 
+\frame{
+    \frametitle{Multiplicative weights majority}
+    \onslide<+->{\begin{block}{A more realistic scenario}
+     we know that in the committee there exists a best expert who can work better than others in the given task;
+    \end{block}}
+    \onslide<+->{
+    \textbf{Regret $R_{n,t}$}: the extra losses the forecaster made without exclusively following the expert $E_n$  up to time $t$: 
+    \begin{equation}
+     R_{n,t}= \hat{L}_t - L_{n,t} = \sum_{i=t}^{t}l(\hat{y}_t, y_t) - \sum_{i=t}^{t}l(f_{n,t}, y_t)
+    \end{equation}
+    }
+
+    \onslide<+->{\begin{block}{the upper bound of regret}
+    $R_{t}^* = \max_{n\in[1,N]} R_{n,t} = \hat{L}_t - \min_{n\in[1,N]}L_{n,t}$
+    \end{block}}
+}
+  
+
 \subsection{Game settings}
 \frame{
-\frametitle{One player game} 
+ \frametitle{One-player game}
+ \onslide<+->One player plays a game, at time $t$ he takes one action $a_t = i\in[1,N]$, then the environment penalize the player 
+ with a loss function $l_t(a_t)$. 
+
+ \onslide<+->{\alert{Note} that the loss function $l_t$ can change over time, i.e. the environment is changing.}
+}
+
+\frame{
+\frametitle{Two-player game} 
+\alert{Two-person zero-sum}: two players ($K=2)$ play a game which is defined by a $N\times N$ cost matrix $\mathbf{C}$ ($N$ is 
+the number of possible actions for players) , where 
+each entry $c_{ij}$ defines \alert{the loss to the row player} when the \structure{row player} takes the action $i\in [1,N]$ and 
+the \structure{column player} takes the action $j\in [1,N]$. 
+
+
+An example cost matrix: 
+$\left[\begin{array}{ccccc}
+  &   1         &   2         &   3         &   4   \\
+1 &   c_{11}    &   c_{12}    &   c_{13}    &   c_{14} \\
+2 &   c_{21}    &   c_{22}    &   c_{23}    &   c_{24} \\
+3 &   c_{31}    &   c_{32}    &   c_{33}    &   c_{34} \\
+4 &   c_{41}    &   c_{42}    &   c_{43}    &   c_{44} 
+\end{array}
+\right]$
+
+The row player's goal is to minimize its loss while the objective of the column player is to maximize it 
 
 }
 
+\frame{
+    \frametitle{Nash Equilibrium}
+    \begin{itemize}
+      \item<1-> no player has an incentive of changing his strategy if the player does not change his, i.e. every player is happy about 
+      current status; 
+      \item<2-> 
+    \end{itemize}
+}
+
+
+\frame{
+    \frametitle{Hanan's theorem}
+    follow the perturbed leading expert; 
+}
+
+\frame{
+    follow the perturbed leading expert; 
+}
+
 \subsection{Universal portfolio}
+\frame{
+    \frametitle{Nonlinear loss}
+    $f_t{i} = \log (-\langle \mathbf{p}_i, \Delta x_{t} \rangle)$
+}
+
+\frame{
+    \frametitle{Han}
+}
 \subsection{Bandit: playing games with limited feedbacks}
 
 
 %-----------------------------------------------------------------------------------------
-\section{Contextual bandit Optimization}
-\subsection{Gaussian process bandit}
+\section{Bandit Optimization in metric spaces}
+\subsection{Gaussian process bandit optimization}
 \subsection{General Bayesian optimization} 
 \subsection{Time-varing surface-responce optimization}
-\subsection{FashionFlow: sequential classification instead of search}
+
+
+
+%------------------------------------------------------------------------------------------
+\section{Concept drift in online decision}
+\subsection{Stability v.s. adaptivity}
+\subsection{Explicite detection of concept drifts}
+\subsection{Tracking the best (set of) experts}
+\subsection{Adaptive regret}
+\subsection{Shifting regret}
+
 
 
 %------------------------------------------------------------------------------------------
 \section{Sku Proposal in FashionFlow}
-\subsection{No dummy experts}
-\subsection{Tracking the best (set of) experts}
-\subsection{Online detection of concept drifts}
+\subsection{FashionFlow: sequential classification instead of search}
+\subsection{From a good classifier to a good proposer}
 
 %------------------------------------------------
 
