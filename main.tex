@@ -78,6 +78,8 @@
 
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage{amsmath}
+\usepackage{mathtools}
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -110,17 +112,17 @@ Zalando SE \\ % Your institution for the title page
 %----------------------------------------------------------------------------------------
 
 %------------------------------------------------
-\section{Online game playing, portfolio and bandit}        % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+\section{Prediction with experts, game playing and portfolio management}        % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
 \subsection{Prediction with Experts' advice}
 \frame{
     \frametitle{A gentle start} 
     \begin{itemize}
-    \item<1-> \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y_t\in\{0,1\}$ at time $t$ based on historical values $\{y_i\}_{i=1}^t$;
-    \item<2->  \structure{Exert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n,t}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
-    \item<3->  \structure{Side information:} other task-relevant information may available, \emph{e.g.} $\{\mathbf{x}_i\}_{i=1}^{t}$;
-    \item<4->  \structure{Forecaster: } an aggregating policy $\pi$ is a function which map experts' advices $\Longrightarrow$ final decision $\hat{y}_t$: $\hat{y}_t = \pi(f_{1,t}, f_{2,t}, \cdots, f_{N,t})$; 
-    \item<5->  \structure{Weights update:} at the beginning, each expert is assigned a (uniform) weight $w_{n,0}$, and it will be updated along the sequence; 
-    \item<6->  \structure{Loss:}  $l(\hat{y}_t, y_t) = \mathbf{1}_{\hat{y}_t \neq y_t}$, $l(f_{n,t}, y_t) = \mathbf{1}_{f_{n,t} \neq y_t}$
+    \item<1->  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item<2->  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
+    \item<3->  \structure{Side information:} other task-relevant information may available, \emph{e.g.} $\{\mathbf{x}^{(t)}\}_{i=1}^{t}$;
+    \item<4->  \structure{Forecaster: } an aggregating policy $\pi$ is a function which map experts' advices $\Longrightarrow$ final decision $\hat{y}_t$: $\hat{y}_t = \pi(f_{1}^{(t)}, f_{2}^{(t)}, \cdots, f_{N}^{(t)})$; 
+    \item<5->  \structure{Weights update:} at the beginning, each expert is assigned a (uniform) weight $w_{n,0}=1$, and it will be updated along the sequence; 
+    \item<6->  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
     \end{itemize}
 }
 
@@ -128,11 +130,11 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{A gentle start, cont.} 
     \onslide<+->{\begin{block}{A simple policy}
-    The final decision is made with the \alert{majority voting} from the expert committee: $\hat{y}_t = \textbf{sign} (\frac{\sum_{n=1}^N f_{i,t}}{N} - 0.5 )$;
+    The final decision is made with the \alert{majority voting} from the expert committee: $\hat{y}^{(t)} = \textbf{sign} (\frac{\sum_{n=1}^N f_{i}^{(t)}}{N} - 0.5 )$;
     \end{block}}
     
     \onslide<+->{\begin{block}{A simple weight update scheme}
-    $w_{n,t} \leftarrow 0$ if expert $E_{n}$ makes a mistake at time $t-1$, \emph{i.e.} kick $E_n$ out of the committee; 
+    $w_{n}^{(t)} \leftarrow 0$ if expert $E_{n}$ makes a mistake at time $t-1$, \emph{i.e.} kick $E_n$ out of the committee; 
     \end{block}}
 
     \onslide<+->{\begin{block}{An ideal scenario}
@@ -142,54 +144,165 @@ Zalando SE \\ % Your institution for the title page
     \onslide<+->{
     \textbf{Cummulative loss}:
     \begin{equation}
-     \hat{L}_t = \sum_{i=t}^{t}l(\hat{y}_t, y_t) \leq \log_{2}N; 
+     \hat{L}^{(t)} = \sum_{i=t}^{t}l(\hat{y}^{(t)}, y^{(t)}) \leq \log_{2}N; 
     \end{equation}
     }
 }
 
 \frame{
-    \frametitle{A gentle start, cont.}
+    \frametitle{Generalized committee}
     \onslide<+->{\begin{block}{A more realistic scenario}
      we know that in the committee there exists a best expert who can work better than others in the given task;
     \end{block}}
     \onslide<+->{
-    \textbf{Regret $R_{n,t}$}: the extra losses the forecaster made without exclusively following the expert $E_n$  up to time $t$: 
+    \textbf{Regret $R_{n}^{(t)}$}: the extra losses the forecaster made without exclusively following the expert $E_n$  up to time $t$: 
     \begin{equation}
-     R_{n,t}= \hat{L}_t - L_{n,t} = \sum_{i=t}^{t}l(\hat{y}_t, y_t) - \sum_{i=t}^{t}l(f_{n,t}, y_t)
+     R_{n}^{(t)}= \hat{L}^{(t)} - L_{n}^{(t)} = \sum_{i=t}^{t}l(\hat{y}^{(t)}, y^{(t)}) - \sum_{i=t}^{t}l(f_{n}^{(t)}, y^{(t)})
     \end{equation}
     }
 
     \onslide<+->{\begin{block}{the upper bound of regret}
-    $R_{t}^* = \max_{n\in[1,N]} R_{n,t} = \hat{L}_t - \min_{n\in[1,N]}L_{n,t}$
+    $R^{(t)*} = \max_{n\in[1,N]} R_{n}^{(t)} = \hat{L}^{(t)} - \min_{n\in[1,N]}L_{n}^{(t)}$
     \end{block}}
 }
     
 
 \frame{
-    \frametitle{Multiplicative weights majority}
-    \onslide<+->{\begin{block}{A more realistic scenario}
-     we know that in the committee there exists a best expert who can work better than others in the given task;
-    \end{block}}
-    \onslide<+->{
-    \textbf{Regret $R_{n,t}$}: the extra losses the forecaster made without exclusively following the expert $E_n$  up to time $t$: 
+    \frametitle{Weighted majority algorithm}
+    \begin{itemize}
+    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
+    \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
+    \line(1,0){450} 
+    \item <2->  \alert{Forecaster: }  $\hat{y}_t = \textbf{sign}(\sum_{n:f_{n,t} =1}w_n^{(t-1)} - \sum_{m:f_{m,t} =-1}w_m^{(t-1)} )$;
+    \item <3->  \alert{Weights update:} if one expert $E_n$ predicts wrongly, decrease its weight 
     \begin{equation}
-     R_{n,t}= \hat{L}_t - L_{n,t} = \sum_{i=t}^{t}l(\hat{y}_t, y_t) - \sum_{i=t}^{t}l(f_{n,t}, y_t)
+       w_{n}^{(t+1)} = (1-\eta) w_n^{(t)}  
     \end{equation}
-    }
-
-    \onslide<+->{\begin{block}{the upper bound of regret}
-    $R_{t}^* = \max_{n\in[1,N]} R_{n,t} = \hat{L}_t - \min_{n\in[1,N]}L_{n,t}$
-    \end{block}}
+    where $\eta \leq \frac{1}{2}$. 
+    \end{itemize}   
 }
-  
 
-\subsection{Game settings}
+
+\frame{
+    \frametitle{Analysis on weighted majority algorithm}
+    \onslide<+->{
+    \begin{theorem}[Regret bound using weighted majority]
+    After T steps, $\hat{L}^{(T)} \leq 2(1+\eta) \min_{1\in[1,N]} L_{n}^{(T)} + \frac{2\ln N}{\eta}$
+    \end{theorem}
+    }
+    \onslide<+->{
+    \alert{Proof:}  Let $\Gamma^{(t)} = \sum_{n \in [1,N]} w_n^{(t)}$, then $\Gamma^{(1)}= N$. Also, if the forecaster makes 
+    a mistake, $\hat{y}^{(t)} \neq y^{(t)}$ 
+    \begin{equation}
+      \Gamma^{(t+1)} \leq \Gamma^{(t)} (\frac{1}{2} + \frac{1}{2} (1-\eta) = \Gamma^{(t)} (1- \frac{\eta}{2})
+    \end{equation}
+    therefore: 
+    \begin{equation}
+       \Gamma^{(T+1)} \leq N (1-\frac{\eta}{2})^{\hat{L}^{(T)}} 
+    \end{equation}
+    for any individual expert $n$
+    \begin{equation}
+       w_n^{(T+1)}  = (1-\eta)^{L_n^{(T)}}
+    \end{equation}
+    since $w_n^{(T+1)} \leq \Gamma^{(T+1)} \Longrightarrow(1-\eta)^{L_n^{(T)}} \leq N (1-\frac{\eta}{2})^{\hat{L}^{(T)}} $
+    }  
+}
+
+\frame{
+    \frametitle{Analysis on weighted majority algorithm, cont.}
+    \begin{equation}
+    \begin{array}{rcl}
+                        (1-\eta)^{L_n^{(T)}}    & \leq &  N (1-\frac{\eta}{2})^{\hat{L}^{(T)}}  \\ \\
+    \Leftrightarrow         L_n^{(T)} \ln (1-\eta)  & \leq &  \ln N +  \hat{L}^{(T)}  \ln (1-\frac{\eta}{2}) \\ \\
+    \Leftrightarrow       -\ln (1-\frac{\eta}{2})   & \leq &  -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
+    \xRightarrow{\alert{x\leq -\ln (1-x)}}  \frac{\eta}{2} \hat{L}^{(T)} & \leq & -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
+    \xRightarrow{\alert{-\ln (1-x) \leq x + x^2, \text{when } x \leq 1/2 }}  \frac{\eta}{2}  \hat{L}^{(T)} & \leq & L_n^{(T)} \eta(1+\eta) + \ln N  \\ \\  
+    \Leftrightarrow  \hat{L}^{(T)} & \leq & 2(1+\eta) L_{n}^{(T)} + \frac{2\ln N}{\eta}
+    \end{array}
+    \end{equation} 
+}
+
+\frame{
+    \frametitle{Randomized weighted majority algorithm}
+    \begin{itemize}
+    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
+    \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
+    \item  \structure{Weights update:} if one expert $E_n$ predicts wrongly, decrease its weight 
+    \begin{equation}
+       w_{n}^{(t+1)} = (1-\eta) w_n^{(t)}  
+    \end{equation}
+    where $\eta \leq 1/2$. 
+    \line(1,0){450} 
+    \item <2->  \alert{Forecaster: }  $\hat{y}_t \sim  \textbf{Bernoulli}\left(\frac{\sum_{n:f_{n,t} =1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}, \frac{\sum_{n:f_{n,t} =-1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}\right)$;
+    \end{itemize}   
+}
+
+\frame{
+    \frametitle{Analysis on randomized weighted majority algorithm}
+    \onslide<+->{
+    \begin{theorem}[Regret bound using randomized weighted majority]
+    After T steps, $\hat{L}^{(T)} \leq (1+\eta) \min_{1\in[1,N]} L_{n}^{(T)} + \frac{\ln N}{\eta}$
+    \end{theorem}
+    }
+    \onslide<+->{
+    \alert{Proof:}  Let $\Gamma^{(t)} = \sum_{n \in [1,N]} w_n^{(t)}$, then $\Gamma^{(1)}= N$. 
+    \newline 
+    At each time $t$, let $F^(t) = \frac{\sum_{n:f_n^{(t)} \neq y^{(t)}} w^{(t)}_n }{\sum_{n} w_n^{(t)}}$, then 
+    \begin{equation}
+      \Gamma^{(t+1)} = \Gamma^{(t)} \Big( 1-F^{(t)} + F^{(t)}(1-\eta) \Big) = \Gamma^{(t)} (1- F^{(t)}\eta)
+    \end{equation}
+    therefore: 
+    \begin{equation}
+       \Gamma^{(T+1)} = N \prod_{t=1}^T(1-F^{(t)}\eta) 
+    \end{equation}
+    for any individual expert $n:       w_n^{(T+1)}  = (1-\eta)^{L_n^{(T)}}$, \\
+    since $w_n^{(T+1)} \leq \Gamma^{(T+1)} \Longrightarrow(1-\eta)^{L_n^{(T)}} \leq N \prod_{t=1}^T(1-F^{(t)}\eta)$
+    }  
+}
+
+
+\frame{
+    \frametitle{Go beyond 0-1 loss}
+    \begin{itemize} 
+    \item  \structure{Task:}  online prediction of a sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
+    \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
+    \item  \structure{Weights update:} if one expert $E_n$ predicts wrongly, decrease its weight 
+    \begin{equation}
+       w_{n}^{(t+1)} = (1-\eta) w_n^{(t)}  
+    \end{equation}
+    where $\eta \leq 1/2$. 
+    \item <2-> \alert{Forecaster: }  $\hat{y}_t \sim  \textbf{Bernoulli}\left(\frac{\sum_{n:f_{n,t} =1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}, \frac{\sum_{n:f_{n,t} =-1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}\right)$;
+    \end{itemize}   
+}
+
+
+\frame{
+    \frametitle{Analysis on randomized weighted majority algorithm, cont.}
+    \begin{equation}
+    \begin{array}{rcl}
+                        (1-\eta)^{L_n^{(T)}}    & \leq &  N \prod_{t=1}^T(1-F^{(t)}\eta) \\ \\
+    \Leftrightarrow         L_n^{(T)} \ln (1-\eta)  & \leq & \ln N + \sum_{t=1}^T \ln(1-F^{(t)}\eta) \\ \\
+    \Leftrightarrow        - \sum_{t=1}^T \ln (1-F^{(t)}\eta)   & \leq &  -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
+    \xRightarrow{\alert{x\leq -\ln (1-x)}} \eta \underbrace{\sum_{t=1}^T F^{(t)}}_{\mathbb{E} \{\hat{L}^{(T)}\}\approx \hat{L}^{(T)} } & \leq & -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
+    \xRightarrow{\alert{-\ln (1-x) \leq x + x^2, \text{when } x \leq 1/2 }}  \eta \hat{L}^{(T)} & < & L_n^{(T)} \eta(1+\eta) + \ln N  \\ \\  
+    \Leftrightarrow  \hat{L}^{(T)} & \leq & (1+\eta) L_{n}^{(T)} + \frac{\ln N}{\eta}
+    \end{array}
+    \end{equation} 
+}
+
+
+\subsection{Online repeated game playing}
 \frame{
  \frametitle{One-player game}
- \onslide<+->One player plays a game, at time $t$ he takes one action $a_t = i\in[1,N]$, then the environment penalize the player 
- with a loss function $l_t(a_t)$. 
-
- \onslide<+->{\alert{Note} that the loss function $l_t$ can change over time, i.e. the environment is changing.}
+ \begin{itemize}
+ \item<1-> One player plays a game, at time $t$ he takes one action $a^{(t)} = i\in[1,N]$, then the environment 
+ releases the cost for each action $\mathbf{m}^{(t)} = [m_1^{(t)}, m_2^{(t)},\cdots, m_N^{(t)}]^\top$,
+ \item<2-> \alert{Note} that the loss function $\mathbf{m}^{(t)}$ can change over time, i.e. the environment is changing.
+ \item<3-> the player takes actions with some  
+ \end{itemize}
 }
 
 \frame{
@@ -242,30 +355,25 @@ The row player's goal is to minimize its loss while the objective of the column 
 \frame{
     \frametitle{Han}
 }
-\subsection{Bandit: playing games with limited feedbacks}
-
 
 %-----------------------------------------------------------------------------------------
 \section{Bandit Optimization in metric spaces}
+\subsection{Bandit: play games with limited feedbacks}
 \subsection{Gaussian process bandit optimization}
 \subsection{General Bayesian optimization} 
-\subsection{Time-varing surface-responce optimization}
-
-
 
 %------------------------------------------------------------------------------------------
 \section{Concept drift in online decision}
 \subsection{Stability v.s. adaptivity}
 \subsection{Explicite detection of concept drifts}
-\subsection{Tracking the best (set of) experts}
-\subsection{Adaptive regret}
-\subsection{Shifting regret}
+\subsection{Adaptive regret for tracking the best expert}
+\subsection{Time-varing suface-responce bandit optimization}
 
 
 
 %------------------------------------------------------------------------------------------
 \section{Sku Proposal in FashionFlow}
-\subsection{FashionFlow: sequential classification instead of search}
+\subsection{Expert setting v.s. Bandit setting}
 \subsection{From a good classifier to a good proposer}
 
 %------------------------------------------------
