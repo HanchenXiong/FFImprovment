@@ -112,7 +112,12 @@ Zalando SE \\ % Your institution for the title page
 %----------------------------------------------------------------------------------------
 
 %------------------------------------------------
-\section{Prediction with experts, game playing and portfolio management}        % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+\section[Online prediction with experts, games, convex optimization]{Online prediction with experts,repeated game playing and convex optimization}        % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+\frame{
+    \frametitle{}
+    \Huge{Online prediction with experts, repeated game playing and convex optimization}
+}
+
 \subsection{Prediction with Experts' advice}
 \frame{
     \frametitle{A gentle start} 
@@ -187,7 +192,7 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{Analysis on weighted majority algorithm}
     \onslide<+->{
-    \begin{theorem}[Regret bound using weighted majority]
+    \begin{theorem}[cummulative loss bound using weighted majority]
     After T steps, $\hat{L}^{(T)} \leq 2(1+\eta) \min_{1\in[1,N]} L_{n}^{(T)} + \frac{2\ln N}{\eta}$
     \end{theorem}
     }
@@ -242,7 +247,7 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{Analysis on randomized weighted majority algorithm}
     \onslide<+->{
-    \begin{theorem}[Regret bound using randomized weighted majority]
+    \begin{theorem}[cummulative loss bound using randomized weighted majority]
     After T steps, $\hat{L}^{(T)} \leq (1+\eta) \min_{1\in[1,N]} L_{n}^{(T)} + \frac{\ln N}{\eta}$
     \end{theorem}
     }
@@ -264,33 +269,77 @@ Zalando SE \\ % Your institution for the title page
 
 
 \frame{
-    \frametitle{Go beyond 0-1 loss}
+    \frametitle{Go beyond binary sequence and 0-1 loss}
     \begin{itemize} 
-    \item  \structure{Task:}  online prediction of a sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
     \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
-    \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
-    \item  \structure{Weights update:} if one expert $E_n$ predicts wrongly, decrease its weight 
+    \item  \structure{Forecaster: }  $\hat{y}^{(t)} = \pi(f_{1}^{(t)}, f_{2}^{(t)}, \cdots, f_{N}^{(t)})$; 
+    \line(1,0){450} 
+    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \alert{Loss:}  a cost vector $[m_1^{(t)}, m_2^{(t)}i, \cdots, m_N^{(t)}]$ is incurred to experts' predictions at time $t$;
+    \item  \alert{Weights update:}  multiplicative manner
     \begin{equation}
-       w_{n}^{(t+1)} = (1-\eta) w_n^{(t)}  
+        w_n^{(t+1)} = w_n^{(t)} g(m_n^{(t)})
     \end{equation}
-    where $\eta \leq 1/2$. 
-    \item <2-> \alert{Forecaster: }  $\hat{y}_t \sim  \textbf{Bernoulli}\left(\frac{\sum_{n:f_{n,t} =1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}, \frac{\sum_{n:f_{n,t} =-1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}\right)$;
+    where $g(x)$ is a decreasing function w.r.t. $x$. 
     \end{itemize}   
 }
 
+\frame{
+    \frametitle{Revisit aggregation policy in binary case}
+     \alert{Forecaster: }  $\hat{y}_t \sim  \textbf{Bernoulli}\left(\frac{\sum_{n:f_{n,t} =1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}, \frac{\sum_{n:f_{n,t} =-1} w_n^{(t-1)}}{\sum_n w_n^{(t-1)}}\right)$;
+     \newline 
+     Let $p^{(t-1)}_n = \frac{w_n^{(t-1)}}{\sum_{n=1}^N w_n^{(t-1)}}$, then 
+     \begin{equation}
+     \begin{array}{rcl}
+        \mathbb{E}\left\{ \hat{y}^{(t)}\right\} & = & (-1)\cdot \sum_{n:f_{n,t}=-1} p_n^{(t-1)}  + 1 \cdot \sum_{n:f_{n,t}=1} p_n^{(t-1)}  \\ \\
+                                                & = &  \sum_{n=1} f_n^{(t)} p_n^{(t-1)} \\   \\
+                                                & = &  \mathbb{E}_{p^{(t-1)}} \left\{ f^{(t)} \right\}
+    \end{array}
+     \end{equation}
+     A further randomized version:  
+     \begin{equation}
+         \hat{y}^{(t)} = f_{n_\dagger}^{(t)} \text{ with } n_\dagger \sim [p_1^{(t-1)},  p_2^{(t-1)}, \cdots,p_N^{(t-1)}]
+     \end{equation}  
+}
 
 \frame{
-    \frametitle{Analysis on randomized weighted majority algorithm, cont.}
+    \frametitle{Randomized weighted majority algorithm IN GENERAL}
+    \begin{itemize} 
+    \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
+    \line(1,0){450} 
+    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \alert{Loss:}  a cost vector $[m_1^{(t)}, m_2^{(t)}i, \cdots, m_N^{(t)}]$ is incurred to experts' predictions at time $t$;
+    \item  \alert{Forecaster: } $\hat{y}^{(t)} = f_{n_\dagger}^{(t)} \text{ with } n_\dagger \sim [p_1^{(t-1)},  p_2^{(t-1)}, \cdots,p_N^{(t-1)}]$ 
+    \item  \alert{Weights update:}  multiplicative manner
     \begin{equation}
-    \begin{array}{rcl}
-                        (1-\eta)^{L_n^{(T)}}    & \leq &  N \prod_{t=1}^T(1-F^{(t)}\eta) \\ \\
-    \Leftrightarrow         L_n^{(T)} \ln (1-\eta)  & \leq & \ln N + \sum_{t=1}^T \ln(1-F^{(t)}\eta) \\ \\
-    \Leftrightarrow        - \sum_{t=1}^T \ln (1-F^{(t)}\eta)   & \leq &  -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
-    \xRightarrow{\alert{x\leq -\ln (1-x)}} \eta \underbrace{\sum_{t=1}^T F^{(t)}}_{\mathbb{E} \{\hat{L}^{(T)}\}\approx \hat{L}^{(T)} } & \leq & -L_n^{(T)} \ln (1-\eta) + \ln N  \\ \\  
-    \xRightarrow{\alert{-\ln (1-x) \leq x + x^2, \text{when } x \leq 1/2 }}  \eta \hat{L}^{(T)} & < & L_n^{(T)} \eta(1+\eta) + \ln N  \\ \\  
-    \Leftrightarrow  \hat{L}^{(T)} & \leq & (1+\eta) L_{n}^{(T)} + \frac{\ln N}{\eta}
-    \end{array}
-    \end{equation} 
+        w_n^{(t+1)} = w_n^{(t)}(1-\eta m_n^{(t)})
+    \end{equation}
+    where $\eta \leq 1/2$
+    \end{itemize}   
+}
+
+\frame{
+    \frametitle{Analysis} 
+    \begin{theorem}[Regret bound using randomized weighted majority]
+    When $m_n^{(t)} \in [-1, 1], \forall n,t$, after T steps,  \newline
+    $\hat{L}^{(T)} \leq \min_{1\in[1,N]} L_{n}^{(T)} + \eta \sum_{t=1}^T |m_n^{(t)}|_1 + \frac{\ln N}{\eta}$
+    \end{theorem}
+    \alert{Regret bound }: $\mathbf{R}^* \leq \eta T + \frac{\ln N}{\eta}$
+}
+
+\frame{
+    \frametitle{Hedge algorithm}
+    \begin{block}{}
+    \alert{Weights update:} 
+    \begin{equation}
+        w_n^{(t+1)} = w_n^{(t)} \exp(-\eta m_n^{(t)})
+    \end{equation}
+    where $\eta \in[0,1]$.
+    \end{block}
+    \begin{theorem}[Regret bound using randomized weighted majority]
+    When $m_n^{(t)} \in [-1, 1], \forall n,t$, after T steps,  \newline
+    $\hat{L}^{(T)} \leq \min_{1\in[1,N]} L_{n}^{(T)} + \eta \sum_{t=1}^T |m_n^{(t)}|_1 + \frac{\ln N}{\eta}$
+    \end{theorem}  
 }
 
 
@@ -299,9 +348,12 @@ Zalando SE \\ % Your institution for the title page
  \frametitle{One-player game}
  \begin{itemize}
  \item<1-> One player plays a game, at time $t$ he takes one action $a^{(t)} = i\in[1,N]$, then the environment 
- releases the cost for each action $\mathbf{m}^{(t)} = [m_1^{(t)}, m_2^{(t)},\cdots, m_N^{(t)}]^\top$,
- \item<2-> \alert{Note} that the loss function $\mathbf{m}^{(t)}$ can change over time, i.e. the environment is changing.
- \item<3-> the player takes actions with some  
+ releases the cost for each action $\mathbf{m}^{(t)} = [m_1^{(t)}, m_2^{(t)},\cdots, m_N^{(t)}]^\top, m_n^{(t)}\in[-1,1]$,
+ \item<1-> \alert{Note} that the loss function $\mathbf{m}^{(t)}$ can change over time, i.e. the environment is changing.
+ \item<2-> if the player selects actions by the probabilities $\mathbf{p}^{(t)}$ computed by randomized weighted majority and update them accordingly, then 
+ \begin{equation}
+    \sum_{t=1}^T \langle \mathbf{m}^{(t)}, \mathbf{p}^{(t)}\rangle \leq  \sum_{t=1}^T m_i^{(t)} + \eta T + \frac{\ln n}{\eta}
+ \end{equation}
  \end{itemize}
 }
 
@@ -338,176 +390,256 @@ The row player's goal is to minimize its loss while the objective of the column 
 
 
 \frame{
-    \frametitle{Hanan's theorem}
-    follow the perturbed leading expert; 
+    \frametitle{Hanan's algorithm for two-player zero-sum game}
+    \begin{block}{Follow the perturbed leading expert}
+     \alert{Forecaster:}  select the action  $i^{(t)} = \arg\min_{i\in [1,N]} \left\{L_i^{(t-1)} + \tau_i \right\}$ 
+     where $\tau_i$ are randomly sampled from $[0, 1/\epsilon]$
+    \end{block}
 }
 
+
+
+\subsection{Online convex optimization}
 \frame{
-    follow the perturbed leading expert; 
+    \frametitle{Arbitrary convex loss function}
 }
 
-\subsection{Universal portfolio}
+
 \frame{
-    \frametitle{Nonlinear loss}
+    \frametitle{Portfolio management}
     $f_t{i} = \log (-\langle \mathbf{p}_i, \Delta x_{t} \rangle)$
 }
 
+
 \frame{
-    \frametitle{Han}
+    \frametitle{Adaboost}
 }
+
+
 
 %-----------------------------------------------------------------------------------------
 \section{Bandit Optimization in metric spaces}
+\frame{
+    \frametitle{}
+    \Huge{Bandit Optimization in metric spaces}
+}
 \subsection{Bandit: play games with limited feedbacks}
+\frame{
+    \frametitle{Observe only one cost}  
+     \begin{itemize}
+        \item  <1-> One player plays a game, at time $t$ he takes one action $a^{(t)} = i\in[1,N]$, then the environment 
+            releases the cost for \alert{only the selected action} $m_{a^{(t)}}^{(t)}$, 
+        \item  <2-> playing games in a Bandit setting falls into  \alert{classic exploitation v.s. exploration dilemma} 
+ \end{itemize}
+}
+
+
+\frame{
+    \frametitle{Multi-armed bandit problem}
+    \begin{figure}     
+        \includegraphics[width = 0.5\textwidth]{bandit-arm}
+    \end{figure}
+}
+
+\frame{
+    \frametitle{Upper confidence bound}
+    \begin{itemize}
+     \item <1-> at each time $t$, play the arm $i^{(t)}$ by 
+     \begin{equation}
+        i^{(t)} = \arg\max_{i\in [1,N]} \left\{\textbf{avg.} [m_i] + \sqrt{\frac{2\ln t}{T_i}} \right\}
+     \end{equation}
+     \item <2-> Regret bound:
+     \begin{equation}
+       \mathbf{R}^{(t)*} \leq \left[ 8 \sum_{i: \mu_i < \mu^* }\frac{\ln t}{\mu^* -\mu_i } \right] + (1+\frac{\pi^2}{3}) (\sum_{i=1}^N (\mu^*-\mu_i) )
+     \end{equation}
+     where $\mu_i$ denote the true expected reward for arm $i$, and $\mu^*$ denote the best one.
+    \end{itemize}
+}
+
+
 \subsection{Gaussian process bandit optimization}
+\frame{
+    \frametitle{Contextual bandit optimization}
+    \begin{itemize}
+       \item <1-> in classic multi-armed bandit problem, all arms are \alert{independent};   
+       \item <2-> in many practical applications, \alert{there exist context beneath arms}, e.g. \structure{representation of arms is in a metric space};    
+    \end{itemize}
+}
+
+\frame{
+    \frametitle{Response surface optimization}
+    \begin{itemize}
+       \item <1->  response surface optimization is an extension of contextual bandit optimization to infinite number of arms; 
+       \item <2->  model the response of arms using a smooth surface function $f$ 
+       \item <3-> a demo mimicking Fashionflow style to understand surface-response optimization; 
+       \item <4-> a most general case, \alert{Lipschit  continuity}: if 
+       \begin{equation}
+            d_x(\mathbf{x}_1, \mathbf{x}_2) \leq L \cdot d_f(f(\mathbf{x}_1), f(\mathbf{x}_2))
+       \end{equation}
+       then we say $f$ is a $L$-Lipschit continuous function. 
+    \end{itemize}
+}
+
+\frame{
+    \frametitle{Gaussian process}
+    \onslide<+->\begin{block}{Definition}
+    A Gaussian process (GP) defines is a collection of random variables, any finite number of of which have joint Gaussian distribution.
+     \begin{equation}
+          f(\mathbf{x}) \sim \mathcal{GP} (\mu(\mathbf{x}), k(\mathbf{x},\mathbf{x}^\prime))
+     \end{equation}
+    \end{block}
+    \onslide<+->\begin{block}{joint Gaussian distribution}
+    \begin{equation}
+        \left[
+        \begin{array}{c}
+        f(\mathbf{X}_{train}) \\
+        f(\mathbf{x}_{test})
+        \end{array}
+        \right]
+        \sim  \left(
+        \left[ 
+        \begin{array}{c}
+        \mu(\mathbf{X}_{train}) \\
+        \mu(\mathbf{x}_{test}) 
+        \end{array}
+        \right], 
+        \left[
+           \begin{array}{cc}
+             k(X_{train}, X_{train})              , &  k(\mathbf{X}_{train}, \mathbf{x}_{test})  \\
+             k(\mathbf{X}_{train}, x_{test})^\top , &  k(\mathbf{x}_{test}, \mathbf{x}_{test})
+           \end{array}
+        \right]
+        \right)
+    \end{equation}
+    \end{block}
+}
+\frame{
+  \frametitle{Gaussian process, cont.}
+    \onslide<+-> \begin{block} {Conditional probability}
+    \begin{equation}
+         f(\mathbf{x}_{test})| f(\mathbf{X}_{train}) \sim  \mathcal{N} \left(\mu_{pos}(\mathbf{x}_{test}), k_{pos}(\mathbf{x}_{test}, \mathbf{x}^{\prime}) \right)
+    \end{equation} 
+    \end{block}
+   \onslide<+-> \begin{block}{Posterior Gaussian process}
+        \begin{equation}
+         f(\mathbf{x})|\mathcal{D}_{train} \sim \mathcal{GP} \left(\mu_{pos}(\mathbf{x}), k_{pos}(\mathbf{x}, \mathbf{x}^\prime)\right)
+    \end{equation}
+    \end{block}
+    where  $\mu_{pos}(\mathbf{x}) = \mu(\mathbf{x}) + k(\mathbf{X}_{train}, \mathbf{x})^\top  k(X_{train}, X_{train}) (f(\mathbf{X}_{train}) - \mathbf{X}_{train}) $ and 
+    $k_{pos}(\mathbf{x}, \mathbf{x}^\prime) = k(\mathbf{x}, \mathbf{x}^\prime) - k(\mathbf{X}_{train}, \mathbf{x})^\top k(\mathbf{X}_{train}, \mathbf{X}_{train})^{-1} k(\mathbf{X}_{train}, \mathbf{x}^\prime) $.
+}
+
+
+\frame{
+    \frametitle{Gaussian process bandit optimization}
+    \begin{block}{Kernel function}
+       squared exponential kernel:  $k(\mathbf{x}, \mathbf{x}^\prime) = \exp(-\frac{||\mathbf{x} - \mathbf{x}^\prime||}{2l^2})$
+    \end{block}
+    \begin{block}{Information gain} 
+        the informativeness of  a set of points  $A \in \mathcal{X}$ for learning $f$ is defined as:
+        \begin{equation}
+         I(\mathbf{y}_A; \mathbf{f}_A) = H(\mathbf{y}_A) - H(\mathbf{y}_A|\mathbf{f}_A)
+        \end{equation}
+    \end{block}
+    \begin{block}{Maximum information gain after $T$ iterations} 
+      $\gamma^{(T)} = \max_{A\in \mathcal{X}:|A|=T}  I(\mathbf{y}_A; \mathbf{f}_A)$
+    \end{block}
+
+}
+
+\frame{
+    \frametitle{Upper confidence bound}
+    \begin{itemize}
+      \item <1-> at each time $t$, chose: 
+     \begin{equation}
+        \mathbf{x}^{(t)} = \arg\max_{\mathbf{x} \in \mathcal{X}} \mu^{(t-1)}(\mathbf{x}) + \kappa^{(t)} \sigma^{(t-1)}(\mathbf{x})
+     \end{equation}
+     where $\kappa^{(t)} = 2B + 300 \gamma^{(t)} \log^3(t/\delta)$, $||f||^2 \leq B$ 
+     \item <2-> Regret bound:
+     \begin{equation}
+          Pr\left\{\mathbf{R}^{(T)*} \leq \sqrt{\frac{8}{\log(1+\sigma^{-1})} T \beta^{(T)}\gamma^{(T)}}\right\} \geq 1-\delta
+     \end{equation}
+    \end{itemize}
+}
+
 \subsection{General Bayesian optimization} 
+\frame{
+    \frametitle{Regression with ensemble models}
+    \begin{itemize} 
+       \item <1->  Gaussian process bandit optimization is an instance of Bayesian optimization; 
+       \item <1->  any function $f$ with certain \structure{smoothness assumption} and \structure{uncertainty measurement} can be used as a pseudo Bayesian optimization;
+       \item <2->  \alert{one example:}  an ensemble of linear functions
+       \begin{enumerate}
+        \item \structure{smoothness assumption}: average of linear functions
+        \begin{figure}
+            \includegraphics[width = 0.3\textwidth] {concept_drift}
+        \end{figure}
+        \item \structure{uncertainty measurement}: std.of linear functions 
+       \end{enumerate}
+       \item <2->  advantage: can better exploit task-relevant features instead of \alert{isotropic length-scale} in kernel function 
+    \end{itemize}
+}
 
 %------------------------------------------------------------------------------------------
 \section{Concept drift in online decision}
+\frame{
+    \frametitle{}
+    \Huge{Concept drift in online decision}
+}
+\frame{
+    \frametitle{What do people do when the concept drifts ?}
+    \begin{figure}
+     \includegraphics[width = 0.7\textwidth]{concept_drift}
+    \end{figure}
+   Assume that the concept drift can be successfully detected, 
+    \begin{itemize}
+       \item <1-> \structure{forget the data} before the new concept in learning algorithms; 
+       \item <2-> \alert{change a new learning algorithm (strategy))}
+    \end{itemize}
+}
 \subsection{Stability v.s. adaptivity}
-\subsection{Explicite detection of concept drifts}
+\frame{
+    \frametitle{Stability and adaptivity when forgetting data}
+    \begin{block}{Definition} 
+        A learning algorithm $\mathcal{A}$ has error stability $\beta_n$ with respect to the loss function $l$ if 
+        \begin{equation*}
+            \forall Z_n \in \mathcal{X}^n, \forall i\in \{1,\cdots, n\} |\mathbb{E}\{l(\mathcal{A}_{Z_n})\} - \mathbb{E}\{l(\mathcal{A}_{Z_n}^{-i})\} | 
+        \end{equation*}
+    \end{block}
+    \begin{block}{Examples}
+        for k-NN, SVM, support vector regression and ridge regression, $\beta_n = \mathcal{O}(\frac{1}{n{)$
+    \end{block}
+    
+}
+\subsection{Explicit detection of concept drifts}
+\frame{
+    \frametitle{Detect concept drift}
+}
 \subsection{Adaptive regret for tracking the best expert}
-\subsection{Time-varing suface-responce bandit optimization}
+\frame{
+    \frametitle{Concept drift = the best expert shift}
+}
+\subsection{Time-varying surface-response bandit optimization}
+\frame{
+    \frametitle{Temporal-spatial kernel}
+}
 
 
 
 %------------------------------------------------------------------------------------------
 \section{Sku Proposal in FashionFlow}
 \subsection{Expert setting v.s. Bandit setting}
-\subsection{From a good classifier to a good proposer}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Paragraphs of Text}
-Sed iaculis dapibus gravida. Morbi sed tortor erat, nec interdum arcu. Sed id lorem lectus. Quisque viverra augue id sem ornare non aliquam nibh tristique. Aenean in ligula nisl. Nulla sed tellus ipsum. Donec vestibulum ligula non lorem vulputate fermentum accumsan neque mollis.\\~\\
-
-Sed diam enim, sagittis nec condimentum sit amet, ullamcorper sit amet libero. Aliquam vel dui orci, a porta odio. Nullam id suscipit ipsum. Aenean lobortis commodo sem, ut commodo leo gravida vitae. Pellentesque vehicula ante iaculis arcu pretium rutrum eget sit amet purus. Integer ornare nulla quis neque ultrices lobortis. Vestibulum ultrices tincidunt libero, quis commodo erat ullamcorper id.
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Bullet Points}
-\begin{itemize}
-\item Lorem ipsum dolor sit amet, consectetur adipiscing elit
-\item Aliquam blandit faucibus nisi, sit amet dapibus enim tempus eu
-\item Nulla commodo, erat quis gravida posuere, elit lacus lobortis est, quis porttitor odio mauris at libero
-\item Nam cursus est eget velit posuere pellentesque
-\item Vestibulum faucibus velit a augue condimentum quis convallis nulla gravida
-\end{itemize}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Blocks of Highlighted Text}
-\begin{block}{Block 1}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-\end{block}
-
-\begin{block}{Block 2}
-Pellentesque sed tellus purus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum quis magna at risus dictum tempor eu vitae velit.
-\end{block}
-
-\begin{block}{Block 3}
-Suspendisse tincidunt sagittis gravida. Curabitur condimentum, enim sed venenatis rutrum, ipsum neque consectetur orci, sed blandit justo nisi ac lacus.
-\end{block}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Multiple Columns}
-\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
-
-\column{.45\textwidth} % Left column and width
-\textbf{Heading}
-\begin{enumerate}
-\item Statement
-\item Explanation
-\item Example
-\end{enumerate}
-
-\column{.5\textwidth} % Right column and width
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer lectus nisl, ultricies in feugiat rutrum, porttitor sit amet augue. Aliquam ut tortor mauris. Sed volutpat ante purus, quis accumsan dolor.
-
-\end{columns}
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Table}
-\begin{table}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\caption{Table caption}
-\end{table}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Theorem}
-\begin{theorem}[Mass--energy equivalence]
-$E = mc^2$
-\end{theorem}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-\frametitle{Verbatim}
-\begin{example}[Theorem Slide Code]
-\begin{verbatim}
-\begin{frame}
-\frametitle{Theorem}
-\begin{theorem}[Mass--energy equivalence]
-$E = mc^2$
-\end{theorem}
-\end{frame}\end{verbatim}
-\end{example}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Figure}
-Uncomment the code on this slide to include your own image from the same directory as the template .TeX file.
-%\begin{figure}
-%\includegraphics[width=0.8\linewidth]{test}
-%\end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}[fragile] % Need to use the fragile option when verbatim is used in the slide
-\frametitle{Citation}
-An example of the \verb|\cite| command to cite within the presentation:\\~
-
-This statement requires citation \cite{p1}.
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{References}
-\footnotesize{
-\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
-\bibitem[Smith, 2012]{p1} John Smith (2012)
-\newblock Title of the publication
-\newblock \emph{Journal Name} 12(3), 45 -- 678.
-\end{thebibliography}
+\frame{
+    \frametitle{Expert committee setting}
+    
 }
-\end{frame}
+
+\frame{
+    \frametitle{Bandit setting}
+}
+
+
+\subsection{Algorithm evaluation}
 
 %------------------------------------------------
 
