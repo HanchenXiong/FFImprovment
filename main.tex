@@ -85,7 +85,7 @@
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
 
-\title[Online Decision-making]{Online Decision-making with a Expert Committee and Its Application on FahsionFlow} % The short title appears at the bottom of every slide, the full title is only on the title page
+\title[Online Decision-making]{Online Decision-making with a Expert Committee and Its Application in FahsionFlow} % The short title appears at the bottom of every slide, the full title is only on the title page
 
 \author{Zalando Search Team} % Your name
 \institute[Zalando SE] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
@@ -122,7 +122,7 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{A gentle start} 
     \begin{itemize}
-    \item<1->  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item<1->  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^{(t-1}$;
     \item<2->  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
     \item<3->  \structure{Side information:} other task-relevant information may available, \emph{e.g.} $\{\mathbf{x}^{(t)}\}_{i=1}^{t}$;
     \item<4->  \structure{Forecaster: } an aggregating policy $\pi$ is a function which map experts' advices $\Longrightarrow$ final decision $\hat{y}_t$: $\hat{y}_t = \pi(f_{1}^{(t)}, f_{2}^{(t)}, \cdots, f_{N}^{(t)})$; 
@@ -134,16 +134,18 @@ Zalando SE \\ % Your institution for the title page
 
 \frame{
     \frametitle{A gentle start, cont.} 
+
     \onslide<+->{\begin{block}{A simple policy}
-    The final decision is made with the \alert{majority voting} from the expert committee: $\hat{y}^{(t)} = \textbf{sign} (\frac{\sum_{n=1}^N f_{i}^{(t)}}{N} - 0.5 )$;
+    The final decision is made with the \alert{majority voting} from the expert committee: $\hat{y}^{(t)} = \textbf{sign} (\frac{\sum_{n=1}^N f_{i}^{(t)}}{N})$;
     \end{block}}
     
-    \onslide<+->{\begin{block}{A simple weight update scheme}
-    $w_{n}^{(t)} \leftarrow 0$ if expert $E_{n}$ makes a mistake at time $t-1$, \emph{i.e.} kick $E_n$ out of the committee; 
-    \end{block}}
 
     \onslide<+->{\begin{block}{An ideal scenario}
     we know that there exist some experts who are perfect in the given task;  
+    \end{block}}
+
+    \onslide<+->{\begin{block}{A simple weight update scheme}
+    $w_{n}^{(t)} \leftarrow 0$ if expert $E_{n}$ makes a mistake at time $t-1$, \emph{i.e.} kick $E_n$ out of the committee; 
     \end{block}}
 
     \onslide<+->{
@@ -175,7 +177,7 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{Weighted majority algorithm}
     \begin{itemize}
-    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^{(t-1)}$;
     \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
     \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
     \line(1,0){450} 
@@ -231,7 +233,7 @@ Zalando SE \\ % Your institution for the title page
 \frame{
     \frametitle{Randomized weighted majority algorithm}
     \begin{itemize}
-    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \structure{Task:}  online prediction of a binary sequence, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\{-1,1\}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^{(t-1)}$;
     \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
     \item  \structure{Loss:}  $l(\hat{y}^{(t)}, y^{(t)}) = \mathbf{1}_{\hat{y}^{(t)} \neq y^{(t)}}$, $l(f_{n}^{(t)}, y^{(t)}) = \mathbf{1}_{f_{n}^{(t)} \neq y^{(t)}}$
     \item  \structure{Weights update:} if one expert $E_n$ predicts wrongly, decrease its weight 
@@ -274,7 +276,7 @@ Zalando SE \\ % Your institution for the title page
     \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
     \item  \structure{Forecaster: }  $\hat{y}^{(t)} = \pi(f_{1}^{(t)}, f_{2}^{(t)}, \cdots, f_{N}^{(t)})$; 
     \line(1,0){450} 
-    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^{(t-1)}$;
     \item  \alert{Loss:}  a cost vector $[m_1^{(t)}, m_2^{(t)}i, \cdots, m_N^{(t)}]$ is incurred to experts' predictions at time $t$;
     \item  \alert{Weights update:}  multiplicative manner
     \begin{equation}
@@ -307,7 +309,7 @@ Zalando SE \\ % Your institution for the title page
     \begin{itemize} 
     \item  \structure{Expert committee:} an expert $E_{n}$ is a man/woman who can make a prediction, $f_{n}^{(t)}$, using different strategies (algorithms/heuristics/data resources); assume there are $N$ experts in the committee; 
     \line(1,0){450} 
-    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^t$;
+    \item  \alert{Task:}  \alert{general online prediction}, \emph{i.e.} sequentially forecast a value $y^{(t)}\in\mathbb{R}$ at time $t$ based on historical values $\{y^{(i)}\}_{i=1}^{(t-1)}$;
     \item  \alert{Loss:}  a cost vector $[m_1^{(t)}, m_2^{(t)}i, \cdots, m_N^{(t)}]$ is incurred to experts' predictions at time $t$;
     \item  \alert{Forecaster: } $\hat{y}^{(t)} = f_{n_\dagger}^{(t)} \text{ with } n_\dagger \sim [p_1^{(t-1)},  p_2^{(t-1)}, \cdots,p_N^{(t-1)}]$ 
     \item  \alert{Weights update:}  multiplicative manner
@@ -382,19 +384,37 @@ The row player's goal is to minimize its loss while the objective of the column 
 \frame{
     \frametitle{Nash Equilibrium}
     \begin{itemize}
-      \item<1-> no player has an incentive of changing his strategy if the player does not change his, i.e. every player is happy about 
-      current status; 
-      \item<2-> 
+      \item<1-> if the row player chooses his action from a distribution $\mathbf{p}$, then the most adversary action the column player should take is 
+       \begin{equation}
+           j:= \arg\max_{j\in[1,N]}  \mathbb{E}_{i\sim \mathbf{p}} \{c_{ij}\}
+       \end{equation}
+       \item<2-> similarly, if column player use a distribution $\mathbf{q}$ , then the row player should take:
+       \begin{equation}
+           i:=  \arg\min_{i\in[1,N]}  \mathbb{E}_{j\sim \mathbf{q}} \{c_{ij}\}
+       \end{equation}
+       \item<3-> \begin{block}{von Neumann's min-max theorem}
+           $\min_{\mathbf{p}}\max_{j}\mathbb{E}_{i\sim \mathbf{p}} \{c_{ij}\} = \max_{\mathbf{q}}\max_{i}\mathbb{E}_{j\sim \mathbf{q}} \{c_{ij}\} = \lambda^*$
+                \end{block}
+      \item<3-> no player has an incentive of changing his strategy (distribution) if the player does not change his, i.e. every player is happy about 
+      current status;  
     \end{itemize}
 }
 
 
 \frame{
     \frametitle{Hanan's algorithm for two-player zero-sum game}
-    \begin{block}{Follow the perturbed leading expert}
+    \onslide<+->\begin{block}{Follow the perturbed leading expert}
      \alert{Forecaster:}  select the action  $i^{(t)} = \arg\min_{i\in [1,N]} \left\{L_i^{(t-1)} + \tau_i \right\}$ 
      where $\tau_i$ are randomly sampled from $[0, 1/\epsilon]$
     \end{block}
+    \onslide<+->\begin{block}{Equivalence to exponential weighted majority}
+    In Hanan's algorithm, when $\tau_i = \frac{1}{\eta} \ln \ln \frac{1}{u_i}$, where $u_i \sim [0,1]$, 
+    \begin{equation*}
+        Pr[i^{(t)} = j] =\frac{e^{-\eta L_j^{(t)}}}{\sum_{k=1}^N e^{-\eta L_k^{(t)}}}
+    \end{equation*}
+    after $T = \frac{4\ln n}{\epsilon}$ iterations, the algorithm can converge to a $\tilde{\mathbf{p}}$ which yield $\lambda^* + \epsilon$
+    \end{block}
+    
 }
 
 
@@ -402,19 +422,17 @@ The row player's goal is to minimize its loss while the objective of the column 
 \subsection{Online convex optimization}
 \frame{
     \frametitle{Arbitrary convex loss function}
+    \begin{itemize}
+       \item <1-> a convex function family on $\mathbf{p}: g(\mathbf{p})$  
+       \item <1-> the whole objective function is presented sequentially: $G(\cdot) = g^{(1)}(\cdot) + g^{(2)}(\cdot) + \cdots  g^{(T)}(\cdot) $ 
+       \item <2-> re-design a loss $\mathbf{m}^{(t)} = \frac{1}{\rho} \Delta f^{(t)}(\mathbf{p})$   
+       \item <2-> $\sum_{t=1}^T f^{(t)}(\mathbf{p}^{(t)}) - \min_\mathbf{p} G(\mathbf{p}) \leq 2\rho \sqrt{\ln n T}$
+       \item <3-> applications \begin{enumerate}
+           \item online portfolio management: $g^{(t)}(\mathbf{p}) = \log (-\mathbf{p}^\top \Delta \mathbf{v}^{(t)})$
+           \item online learning algorithms: $g^{(t)}(\mathbf{p}) = ||y^{(t)} - \mathbf{p}^\top \mathbf{x}^{(t)}||_2^2 $
+       \end{enumerate}
+    \end{itemize}
 }
-
-
-\frame{
-    \frametitle{Portfolio management}
-    $f_t{i} = \log (-\langle \mathbf{p}_i, \Delta x_{t} \rangle)$
-}
-
-
-\frame{
-    \frametitle{Adaboost}
-}
-
 
 
 %-----------------------------------------------------------------------------------------
@@ -452,7 +470,7 @@ The row player's goal is to minimize its loss while the objective of the column 
      \begin{equation}
        \mathbf{R}^{(t)*} \leq \left[ 8 \sum_{i: \mu_i < \mu^* }\frac{\ln t}{\mu^* -\mu_i } \right] + (1+\frac{\pi^2}{3}) (\sum_{i=1}^N (\mu^*-\mu_i) )
      \end{equation}
-     where $\mu_i$ denote the true expected reward for arm $i$, and $\mu^*$ denote the best one.
+     where $\mu_i$ denotes the true expected reward for arm $i$, and $\mu^*$ denotes the best one.
     \end{itemize}
 }
 
@@ -462,7 +480,7 @@ The row player's goal is to minimize its loss while the objective of the column 
     \frametitle{Contextual bandit optimization}
     \begin{itemize}
        \item <1-> in classic multi-armed bandit problem, all arms are \alert{independent};   
-       \item <2-> in many practical applications, \alert{there exist context beneath arms}, e.g. \structure{representation of arms is in a metric space};    
+       \item <2-> in many practical applications, \alert{there exists a context beneath arms}, e.g. \structure{representation of arms is in a metric space};    
     \end{itemize}
 }
 
@@ -542,7 +560,11 @@ The row player's goal is to minimize its loss while the objective of the column 
         \end{equation}
     \end{block}
     \begin{block}{Maximum information gain after $T$ iterations} 
-      $\gamma^{(T)} = \max_{A\in \mathcal{X}:|A|=T}  I(\mathbf{y}_A; \mathbf{f}_A)$
+      $\gamma^{(T)} = \max_{A\in \mathcal{X}:|A|=T}  I(\mathbf{y}_A; \mathbf{f}_A)$ \newline 
+      \begin{itemize}
+        \item  maximum information gain basically reflect the complexity of $f$; 
+        \item  for RBF kernel, $\gamma^{(T)} = \mathcal{O} \left((\log T)^{d+1}\right)$ 
+      \end{itemize}
     \end{block}
 
 }
@@ -559,6 +581,7 @@ The row player's goal is to minimize its loss while the objective of the column 
      \begin{equation}
           Pr\left\{\mathbf{R}^{(T)*} \leq \sqrt{\frac{8}{\log(1+\sigma^{-1})} T \beta^{(T)}\gamma^{(T)}}\right\} \geq 1-\delta
      \end{equation}
+     \item <2->  Regret bound complexity: $\mathbf{R}^{(T)*} = \mathcal{O} \left(\sqrt{T(\log T)^{d+1}}\right)$. 
     \end{itemize}
 }
 
@@ -569,11 +592,11 @@ The row player's goal is to minimize its loss while the objective of the column 
        \item <1->  Gaussian process bandit optimization is an instance of Bayesian optimization; 
        \item <1->  any function $f$ with certain \structure{smoothness assumption} and \structure{uncertainty measurement} can be used as a pseudo Bayesian optimization;
        \item <2->  \alert{one example:}  an ensemble of linear functions
+       \begin{figure}
+        \includegraphics[width = 0.3\textwidth]{lines}
+       \end{figure}
        \begin{enumerate}
         \item \structure{smoothness assumption}: average of linear functions
-        \begin{figure}
-            \includegraphics[width = 0.3\textwidth] {concept_drift}
-        \end{figure}
         \item \structure{uncertainty measurement}: std.of linear functions 
        \end{enumerate}
        \item <2->  advantage: can better exploit task-relevant features instead of \alert{isotropic length-scale} in kernel function 
@@ -594,7 +617,7 @@ The row player's goal is to minimize its loss while the objective of the column 
    Assume that the concept drift can be successfully detected, 
     \begin{itemize}
        \item <1-> \structure{forget the data} before the new concept in learning algorithms; 
-       \item <2-> \alert{change a new learning algorithm (strategy))}
+       \item <2-> \alert{change a new learning algorithm (strategy)}
     \end{itemize}
 }
 \subsection{Stability v.s. adaptivity}
@@ -607,42 +630,164 @@ The row player's goal is to minimize its loss while the objective of the column 
         \end{equation*}
     \end{block}
     \begin{block}{Examples}
-        for k-NN, SVM, support vector regression and ridge regression, $\beta_n = \mathcal{O}(\frac{1}{n{)$
+        for k-NN, SVM, support vector regression and ridge regression, $\beta_n = \mathcal{O}(\frac{1}{n})$
     \end{block}
     
 }
 \subsection{Explicit detection of concept drifts}
 \frame{
     \frametitle{Detect concept drift}
-}
-\subsection{Adaptive regret for tracking the best expert}
-\frame{
-    \frametitle{Concept drift = the best expert shift}
+    \begin{itemize}
+        \item Essentially, the detection has been conducted via hypothesis test sequentially. 
+        \newline
+          $l(\mathcal{A}_{\{\mathbf{x}_1,\cdots, \mathbf{x}_n-t\}}, \underbrace{\{\mathbf{x}_{n-t+1}, \cdots, \mathbf{x}_n\}}_{\text{time window}}) \Longrightarrow$  \newline 
+          \alert{null  hypothesis} v.s.\alert{alternative hypothesis}
+        \item Can work well with good hyper-parameter settings. 
+    \end{itemize}
 }
 \subsection{Time-varying surface-response bandit optimization}
 \frame{
     \frametitle{Temporal-spatial kernel}
+    \begin{itemize} 
+        \item <1-> Typical analysis of Gaussian process bandit optimization is in a stationary environment.
+        \item <2-> When involving the concept drift, the kernel can be defined in a temporal-spatial manner, 
+                    i.e. \alert{scale down the kernel values of old instances};
+        \item <3-> Regret bound: 
+         \begin{equation}
+              Pr\left\{\mathbf{R}^{(T)*} \leq \sqrt{\frac{8}{\log(1+\sigma^{-1})} T \beta^{(T)}\alert{\hat{\gamma}^{(T)}}}\right\} \geq 1-\delta
+         \end{equation}
+    \end{itemize}
 }
+
+\subsection{Adaptive regret for tracking the best expert}
+\frame{
+    \frametitle{Concept drift in expert committee}
+    \begin{enumerate} 
+        \item \alert{A expert committee} 
+        \begin{itemize}
+            \item an expert which uses some side information; 
+            \item an expert which uses short-memory of instances;
+            \item an expert which uses whole sequence of instances; 
+            \item an expert which can detect concept drifts and forget old data; 
+        \end{itemize}
+       
+       \item concept drift == best expert shift
+    \end{enumerate} 
+}
+
+\frame{
+    \frametitle{Adaptive regret and Fixed-share algorithm}
+    \begin{itemize}          
+        \item<1-> regular regret: \newline 
+        $R^{(t)*} = \max_{n\in[1,N]} R_{n}^{(t)} = \hat{L}^{(t)} - \min_{n\in[1,N]}L_{n}^{(t)}$
+        \item<2->  adaptive regret: \newline 
+        $\bar{R}^{(t)*} = \sup_{[t1,t2]\subseteq [1,t]} \left\{ \hat{L}^{[t1,t2]} - \min_{n\in[1,N]}L_{n}^{[t1,t2]} \right\}$
+        \item<3-> weight-share algorithm:
+        \begin{block}{Fixed-share algorithm}
+            \alert{Weight update} 
+           if one expert $E_n$ predicts wrongly, decrease its weight 
+             \begin{equation}
+                \hat{w}_{n}^{(t+1)} = w_n^{(t)}\exp^{(-\eta m_n^{(t)})} 
+             \end{equation}
+           followed by a weight-share update:
+            \begin{equation}
+                w_n^{(t+1)} = (1-\alpha) \hat{w}_{n}^{(t+1)}  + \frac{\alpha}{N-1} \sum_{m\neq n}^N \hat{w}_m^{(t+1)} 
+            \end{equation}
+        \end{block}
+    \end{itemize}
+}
+
 
 
 
 %------------------------------------------------------------------------------------------
-\section{Sku Proposal in FashionFlow}
+\section{New sku proposal plans in FashionFlow}
+\frame{
+    \Huge{New sku proposal plans in FahsionFlow}
+}
 \subsection{Expert setting v.s. Bandit setting}
 \frame{
-    \frametitle{Expert committee setting}
+    \frametitle{Expert committee interpretation}
+    by considering each expert is a sku proposer,
+    \begin{itemize}
+        \item  fully observed feedback for all experts;
+        \item  can flexibly define cost function ;
+        \item  can flexibly add diverse experts;
+        \item  regret bound complexity: $\mathcal{O}(\sqrt{T\ln N})$
+        \item  clear understanding of performance in non-stationary environments; 
+        \item  can be computational expensive by maintaining many experts;
+        \item  there exist some gap between \alert{sequential proposal} and \alert{search} 
+    \end{itemize}  
+}
+
+\frame{
+    \frametitle{Bandit interpretation within ensemble learning}
+    \begin{itemize}
+       \item partially observed feedback only on the selected sku;
+       \item no explicit loss function;
+       \item non-trivial analysis of the information gains for different types of functions; 
+       \item regret bound complexity: $\mathcal{O} \left(\sqrt{T(\log T)^{d+1}}\right)$ 
+       \item difficult to analyze information gain in non-stationary environments;  
+       \item GP complexity $\mathcal{O}(n^3)$; also can be computational expensive by maintaining many models;
+       \item it stands closer to the nature of the \emph{Search} task;
+    \end{itemize}
     
 }
 
 \frame{
-    \frametitle{Bandit setting}
+    \frametitle{Connections}
+    if $\kappa = 0$ for all $t$, then \alert{Bandit setting == Expert committee setting} in the aggregation policy:
+    \begin{block}{A reminder}
+    \begin{equation*}
+          \hat{y}^{(t)}  = \sum_{n=1}^{N} p_n^{(t-1)} f_n^{(t)}
+    \end{equation*}
+    \end{block}
+}
+
+\frame{
+    \frametitle{Plans and outlooks}
+    Under expert committee interpretation framework:
+    \begin{itemize} 
+      
+       \item  <1->define more diverse proposal experts (strategies);
+       \item  <1-> design an informative loss function;
+       \begin{enumerate}
+             \item loss function for classifiers
+             \begin{equation*}
+                 m_n^{(t)} =  \exp^{- p_n^{(t)} (y^{(t)})}
+             \end{equation*}
+             where $y^{(n)} = \{-1, 1\}$ and $p_n^{(t)}$ denotes the classification probability of $E_n$ 
+             \item loss function for regressor (ranker)
+             \begin{equation*}
+                    ??                      
+            \end{equation*}
+       \end{enumerate}
+       \item  <2-> enable some experts with concept drift detection and data forgetting mechanism;
+       \item  <2-> track the best expert using weight-share algorithm 
+    \end{itemize}    
 }
 
 
+
 \subsection{Algorithm evaluation}
+\frame{
+    \frametitle{Quantitative evaluation}
+    \begin{itemize}
+        \item \structure{Expert committee interpretation:} \newline 
+        cumulative loss of the forecaster or regret;
+        \item \structure{Bandit interpretation: }\newline
+        use pseudo targets (wishlist); 
+        
+    \end{itemize}
+}
+
 
 %------------------------------------------------
 
+\frame{
+
+    \structure{References}: Nicolo Cesa-Bianchi and Gabor Lugosi. 2006. Prediction, Learning, and Games. Cambridge University Press, New York, NY, USA.
+}
 \begin{frame}
 \Huge{\centerline{The End}}
 \end{frame}
